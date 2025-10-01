@@ -29,8 +29,9 @@ st.markdown("""
     .subtitle {
         font-size: 1.1rem;
         color: #666;
-        text-align: center;
+        text-align: left;
         margin-bottom: 2rem;
+        line-height: 1.5;
     }
     .stButton button {
         width: 100%;
@@ -65,6 +66,8 @@ st.markdown("""
         max-width: 800px;
         margin-left: auto;
         margin-right: auto;
+        text-align: left;
+        line-height: 1.8;
     }
     .medium-risk {
         background-color: #fff3e0;
@@ -75,6 +78,8 @@ st.markdown("""
         max-width: 800px;
         margin-left: auto;
         margin-right: auto;
+        text-align: left;
+        line-height: 1.8;
     }
     .low-risk {
         background-color: #e8f5e8;
@@ -85,6 +90,8 @@ st.markdown("""
         max-width: 800px;
         margin-left: auto;
         margin-right: auto;
+        text-align: left;
+        line-height: 1.8;
     }
     .form-container {
         max-width: 600px;
@@ -103,6 +110,9 @@ st.markdown("""
         margin-top: 2rem;
         padding-top: 1rem;
         border-top: 1px solid #e0e0e0;
+    }
+    .recommendation-item {
+        margin-bottom: 0.5rem;
     }
     /* 移除所有widget的边框和特殊样式 */
     .stSlider, .stSelectbox, .stNumberInput {
@@ -226,34 +236,43 @@ def get_risk_recommendation(probability):
     if probability > 0.7:
         return "high", """
         ⚠️ **High risk: immediate clinical intervention recommended**
-        - Weekly follow-up monitoring
-        - Physical therapy intervention is necessary
-        - Comprehensive assessment of complications
-        - Multidisciplinary team management
-        - Emergency nutritional support
+        
+        • Weekly follow-up monitoring
+        • Physical therapy intervention is necessary
+        • Comprehensive assessment of complications
+        • Multidisciplinary team management
+        • Emergency nutritional support
         """
     elif probability > 0.3:
         return "medium", """
         ⚠️ **Medium risk: It is recommended to regularly monitor**
-        - Assess every 3-6 months
-        - Suggest moderate exercise plan
-        - Basic Nutritional Assessment
-        - Fall prevention education
-        - Regular functional assessment
+        
+        • Assess every 3-6 months
+        • Suggest moderate exercise plan
+        • Basic Nutritional Assessment
+        • Fall prevention education
+        • Regular functional assessment
         """
     else:
         return "low", """
         ✅ **Low risk: Recommended for routine health management**
-        - Annual physical examination
-        - Maintain a healthy lifestyle
-        - Preventive Health Guidance
-        - Moderate physical activity
-        - Balanced nutritional intake
+        
+        • Annual physical examination
+        • Maintain a healthy lifestyle
+        • Preventive Health Guidance
+        • Moderate physical activity
+        • Balanced nutritional intake
         """
 
-# Application title
+# Application title - 标题放在一行
 st.markdown('<h1 class="main-header">🩺 Frailty Risk Prediction System for Patients with Knee Osteoarthritis</h1>', unsafe_allow_html=True)
-st.markdown('<div class="subtitle">Based on the input clinical features, predict the probability of frailty in patients with knee osteoarthritis and visualize the decision-making rationale.</div>', unsafe_allow_html=True)
+
+# 副标题左对齐
+st.markdown("""
+<div class="subtitle">
+Based on the input clinical features, predict the probability of frailty in patients with knee osteoarthritis and visualize the decision-making rationale.
+</div>
+""", unsafe_allow_html=True)
 
 # Form container - centered
 st.markdown('<div class="form-container">', unsafe_allow_html=True)
