@@ -47,16 +47,6 @@ st.markdown("""
     .stButton button:hover {
         background-color: #1668a5;
     }
-    .result-section {
-        background-color: #e8f5e8;
-        padding: 1.5rem;
-        border-radius: 10px;
-        margin-top: 2rem;
-        text-align: center;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-    }
     .high-risk {
         background-color: #ffebee;
         padding: 1.5rem;
@@ -336,26 +326,23 @@ if submit_button:
     st.markdown("---")
     
     # Prediction result
-    st.markdown(f'<div class="result-section">', unsafe_allow_html=True)
     st.markdown(f"### 📊 Prediction result: The probability of patient frailty is **{current_val:.1%}**")
-    st.markdown(f'</div>', unsafe_allow_html=True)
     
     # Provide recommendations based on probability
     risk_level, recommendation = get_risk_recommendation(current_val)
     
     if risk_level == "high":
-        st.markdown(f'<div class="high-risk">{recommendation}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="high-risk">{recommendation}', unsafe_allow_html=True)
     elif risk_level == "medium":
-        st.markdown(f'<div class="medium-risk">{recommendation}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="medium-risk">{recommendation}', unsafe_allow_html=True)
     else:
-        st.markdown(f'<div class="low-risk">{recommendation}</div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="low-risk">{recommendation}', unsafe_allow_html=True)
     
     # SHAP diagram - centered
     st.markdown("### 📈 SHAP force analysis diagram")
     st.markdown('<div class="shap-container">', unsafe_allow_html=True)
     shap_image = create_shap_force_plot(base_val, shap_vals, sample_data)
     st.image(shap_image, use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
 # Footer instructions
 st.markdown("---")
@@ -365,4 +352,3 @@ st.markdown("""
     <p>© 2025 KOA Prediction System | For clinical reference only</p>
 </div>
 """, unsafe_allow_html=True)
-
