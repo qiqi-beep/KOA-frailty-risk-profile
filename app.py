@@ -235,7 +235,7 @@ def get_risk_recommendation(probability):
     """Provide recommendations based on probability value"""
     if probability > 0.7:
         return "high", """
-        ⚠️ **High risk: immediate clinical intervention recommended**
+        ⚠️ High risk: immediate clinical intervention recommended
         
         • Weekly follow-up monitoring
         • Physical therapy intervention is necessary
@@ -243,9 +243,9 @@ def get_risk_recommendation(probability):
         • Multidisciplinary team management
         • Emergency nutritional support
         """
-    elif probability > 0.3:
+    elif probability > 0.45:
         return "medium", """
-        ⚠️ **Medium risk: It is recommended to regularly monitor**
+        ⚠️ Medium risk: It is recommended to regularly monitor
         
         • Assess every 3-6 months
         • Suggest moderate exercise plan
@@ -255,7 +255,7 @@ def get_risk_recommendation(probability):
         """
     else:
         return "low", """
-        ✅ **Low risk: Recommended for routine health management**
+        ✅ Low risk: Recommended for routine health management
         
         • Annual physical examination
         • Maintain a healthy lifestyle
@@ -365,3 +365,4 @@ st.markdown("""
     <p>© 2025 KOA Prediction System | For clinical reference only</p>
 </div>
 """, unsafe_allow_html=True)
+
