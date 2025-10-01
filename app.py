@@ -1,16 +1,21 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import plotly.graph_objects as go
-import plotly.express as px
+import matplotlib.pyplot as plt
+import shap
+import io
 
-# 页面配置
+# 页面配置 - 使用centered布局但通过CSS让内容居中
 st.set_page_config(
     page_title="Frailty Risk Prediction System for Patients with Knee Osteoarthritis",
     page_icon="🩺",
     layout="centered",
     initial_sidebar_state="collapsed"
 )
+
+# 设置中文字体
+plt.rcParams['font.sans-serif'] = ['SimHei', 'Arial Unicode MS', 'DejaVu Sans']
+plt.rcParams['axes.unicode_minus'] = False
 
 # 自定义CSS样式 - 让所有内容居中
 st.markdown("""
@@ -164,65 +169,57 @@ def calculate_shap_values(sample_data):
     
     return base_value, current_value, shap_values, feature_names, features
 
-def create_shap_force_plot(base_value, shap_values, feature_names, sample_data):
-    """Create SHAP force plot using Plotly"""
+def create_shap_force_plot(base_value, shap_values, sample_data):
+    """Create SHAP force analysis diagram"""
     
-    # Calculate cumulative values for the waterfall effect
-    cumulative = base_value
-    x_values = [base_value]
-    feature_labels = ["Base Value"]
+    # Feature display name mapping
+    feature_display_names = {
+        'FTSST': 'FTSST',
+        'Complications': 'Complications',
+        'fall': 'History of falls',
+        'bl_crp': 'CRP',
+        'PA': 'PA',
+        'bl_hgb': 'HGB',
+        'smoke': 'Smoke',
+        'gender': 'Gender',
+        'age': 'Age',
+        'bmi': 'BMI',
+        'ADL': 'ADL'
+    }
     
-    for i, (feature, shap_val) in enumerate(zip(feature_names, shap_values)):
-        cumulative += shap_val
-        x_values.append(cumulative)
-        feature_labels.append(feature)
+    features = list(sample_data.keys())
     
-    # Create the waterfall plot
-    fig = go.Figure()
+    # Create feature display names (including values)
+    feature_display = []
+    for feat in features:
+        display_name = feature_display_names[feat]
+        value = sample_data[feat]
+        feature_display.append(f"{display_name} = {value}")
     
-    # Add base value line
-    fig.add_shape(
-        type="line",
-        x0=base_value, y0=0,
-        x1=base_value, y1=len(feature_names),
-        line=dict(color="gray", width=2, dash="dash"),
-        name="Base Value"
+    # Create figure
+    plt.figure(figsize=(14, 6))
+    
+    # Create SHAP force plot
+    shap.force_plot(
+        base_value,
+        shap_values,
+        feature_names=feature_display,
+        matplotlib=True,
+        show=False,
+        plot_cmap=['#FF0D57', '#1E88E5']  # Red = increases risk, Blue = decreases risk
     )
     
-    # Add feature contributions
-    for i, (feature, shap_val) in enumerate(zip(feature_names, shap_values)):
-        color = '#FF4B4B' if shap_val > 0 else '#0068C9'
-        
-        fig.add_trace(go.Bar(
-            x=[shap_val],
-            y=[feature],
-            orientation='h',
-            marker_color=color,
-            name=feature,
-            hovertemplate=f'<b>{feature}</b><br>Value: {list(sample_data.values())[i]}<br>SHAP Contribution: {shap_val:.4f}<br>Impact: {"Increases Risk" if shap_val > 0 else "Decreases Risk"}<extra></extra>'
-        ))
+    plt.title("SHAP Force Plot for Individual Prediction", 
+              fontsize=16, fontweight='bold', pad=20)
+    plt.tight_layout()
     
-    fig.update_layout(
-        title="SHAP Force Analysis Diagram",
-        xaxis_title="Model Output Value",
-        yaxis_title="Features",
-        barmode='relative',
-        height=500,
-        showlegend=False,
-        plot_bgcolor='white'
-    )
+    # Convert matplotlib figure to image for display in Streamlit
+    buf = io.BytesIO()
+    plt.savefig(buf, format='png', dpi=300, bbox_inches='tight')
+    buf.seek(0)
+    plt.close()
     
-    # Add final prediction annotation
-    final_value = base_value + sum(shap_values)
-    fig.add_annotation(
-        x=final_value,
-        y=len(feature_names) - 0.5,
-        text=f"Final Prediction: {final_value:.3f}",
-        showarrow=True,
-        arrowhead=1
-    )
-    
-    return fig
+    return buf
 
 def get_risk_recommendation(probability):
     """Provide recommendations based on probability value"""
@@ -337,8 +334,8 @@ if submit_button:
     # SHAP diagram - centered
     st.markdown("### 📈 SHAP force analysis diagram")
     st.markdown('<div class="shap-container">', unsafe_allow_html=True)
-    shap_fig = create_shap_force_plot(base_val, shap_vals, feature_names, sample_data)
-    st.plotly_chart(shap_fig, use_container_width=True)
+    shap_image = create_shap_force_plot(base_val, shap_vals, sample_data)
+    st.image(shap_image, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 # Footer instructions
